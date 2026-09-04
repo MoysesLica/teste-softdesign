@@ -4,7 +4,7 @@ import com.softdesign.votacao.dto.pauta.PautaCreateRequest;
 import com.softdesign.votacao.dto.pauta.PautaOpenToVotingRequest;
 import com.softdesign.votacao.dto.pauta.PautaResponse;
 import com.softdesign.votacao.dto.pauta.PautaPatchRequest;
-import com.softdesign.votacao.service.PautaService;
+import com.softdesign.votacao.service.v1.PautaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

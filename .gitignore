@@ -1,37 +1,20 @@
-HELP.md
-services/votacao-service/.gradle
-services/votacao-service/build/
-!services/votacao-service/gradle/wrapper/gradle-wrapper.jar
+# Variáveis locais
+.env
+.env.*
+!.env.example
+
+# Gradle
+.gradle/
+build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-services/votacao-service/.idea
-*.iws
+# IntelliJ
+.idea/
 *.iml
+*.iws
 *.ipr
+
+# Java
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
+bin/

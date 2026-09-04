@@ -1,4 +1,4 @@
-package com.softdesign.votacao.service;
+package com.softdesign.votacao.service.v1;
 
 import com.softdesign.votacao.dto.pauta.PautaCreateRequest;
 import com.softdesign.votacao.dto.pauta.PautaOpenToVotingRequest;
@@ -76,6 +76,8 @@ public class PautaService {
 
     public PautaResponse abrirParaVotacao(UUID id, @Valid PautaOpenToVotingRequest pautaRequest) {
         Pauta pauta = pautaRepository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Pauta não encontrada"));
+        if(pauta.isFechada())
+            throw new PreconditionFailedException("Pauta já fechada para votação");
         if(pauta.isAbertoParaVotacao())
             throw new PreconditionFailedException("Pauta já aberta para votação");
         pauta.setAbertoParaVotacao(true);
@@ -88,6 +90,8 @@ public class PautaService {
         Pauta pauta = pautaRepository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Pauta não encontrada"));
         if(!pauta.isAbertoParaVotacao())
             throw new PreconditionFailedException("Pauta não aberta para votação");
+        if(pauta.isFechada())
+            throw new PreconditionFailedException("Pauta já fechada");
         if(ZonedDateTime.now().isBefore(pauta.getDataEncerramento()))
             pauta.setDataEncerramento(ZonedDateTime.now());
         pauta.setAbertoParaVotacao(false);

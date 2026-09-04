@@ -19,14 +19,29 @@ services:
     restart: unless-stopped
   votacao-service:
     build:
-      context: ./services/votacao-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/votacao-service/Dockerfile
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      VALIDACAO_CPF_URL: ${VALIDACAO_CPF_URL}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+  validacao-cpf-service:
+    build:
+      context: .
+      dockerfile: services/validacao-cpf-service/Dockerfile
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       DB_USERNAME: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       postgres:
         condition: service_healthy

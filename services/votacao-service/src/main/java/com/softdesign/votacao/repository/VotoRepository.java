@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface VotoRepository extends JpaRepository<Voto, UUID> {
     Page<Voto> findByPauta(Pauta pauta, Pageable pageable);
     List<Voto> findByPauta(Pauta pauta);
+    boolean existsByPautaAndCpf(Pauta pauta, String cpf);
 }

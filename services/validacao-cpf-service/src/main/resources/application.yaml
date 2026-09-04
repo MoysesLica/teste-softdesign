@@ -1,6 +1,6 @@
 spring:
   application:
-    name: teste
+    name: validacao-cpf-service
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -15,7 +15,3 @@ spring:
         jdbc:
           time_zone: UTC
     show-sql: false
-
-integrations:
-  validacao-cpf:
-    base-url: ${VALIDACAO_CPF_URL}

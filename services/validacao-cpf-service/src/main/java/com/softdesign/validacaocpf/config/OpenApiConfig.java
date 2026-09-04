@@ -1,4 +1,4 @@
-package com.softdesign.votacao.config;
+package com.softdesign.validacaocpf.config;
 
 import io.swagger.v3.oas.models.info.Info;
 import org.springdoc.core.models.GroupedOpenApi;
@@ -15,23 +15,10 @@ public class OpenApiConfig {
                 .pathsToMatch("/api/v1/**")
                 .addOpenApiCustomizer(openApi ->
                         openApi.info(new Info()
-                                .title("API para o teste da SoftDesign")
+                                .title("API para validação de CPF para o teste da SoftDesign")
                                 .description("Primeira versão da API")
                                 .version("v1")))
                 .build();
-    }
-
-    @Bean
-    public GroupedOpenApi apiV2() {
-        return GroupedOpenApi.builder()
-            .group("v2")
-            .pathsToMatch("/api/v2/**")
-            .addOpenApiCustomizer(openApi ->
-                openApi.info(new Info()
-                    .title("API para o teste da SoftDesign")
-                    .description("Segunda versão da API")
-                    .version("v2")))
-            .build();
     }
 
 }

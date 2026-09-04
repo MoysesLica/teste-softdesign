@@ -1,0 +1,16 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'com.softdesign.contracts'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(26)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
