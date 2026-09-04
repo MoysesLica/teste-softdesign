@@ -1,12 +1,19 @@
 spring:
   application:
     name: teste
+  main:
+    banner-mode: "off"
+  http:
+    clients:
+      connect-timeout: 2s
+      read-timeout: 3s
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     properties:
@@ -14,8 +21,67 @@ spring:
         format_sql: false
         jdbc:
           time_zone: UTC
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
     show-sql: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    admin:
+      fail-fast: false
+    producer:
+      acks: all
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        "[enable.idempotence]": true
+        "[spring.json.add.type.headers]": false
+        "[compression.type]": lz4
+        "[linger.ms]": 5
+        "[batch.size]": 65536
+        "[delivery.timeout.ms]": 5000
+        "[request.timeout.ms]": 3000
+        "[max.block.ms]": 5000
+    consumer:
+      group-id: ${KAFKA_VOTO_GROUP_ID:votacao-service-v3}
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        "[spring.json.value.default.type]": com.softdesign.votacao.kafka.event.VotoSolicitadoEvent
+        "[spring.json.trusted.packages]": com.softdesign.votacao.kafka.event
+        "[max.poll.records]": 20
+    listener:
+      ack-mode: record
+      concurrency: ${KAFKA_CONSUMER_CONCURRENCY:6}
 
 integrations:
   validacao-cpf:
     base-url: ${VALIDACAO_CPF_URL}
+
+kafka:
+  voto:
+    topic: ${KAFKA_VOTO_TOPIC:voto-solicitado-v3}
+    partitions: ${KAFKA_VOTO_PARTITIONS:6}
+    retry:
+      attempts: ${KAFKA_RETRY_ATTEMPTS:4}
+      delay: ${KAFKA_RETRY_DELAY:1s}
+      multiplier: ${KAFKA_RETRY_MULTIPLIER:2}
+      max-delay: ${KAFKA_RETRY_MAX_DELAY:30s}
+      jitter: ${KAFKA_RETRY_JITTER:250ms}
+    publicacao:
+      intervalo: ${KAFKA_PUBLICACAO_INTERVALO:100ms}
+      lote: ${KAFKA_PUBLICACAO_LOTE:500}
+      timeout: ${KAFKA_PUBLICACAO_TIMEOUT:5000}
+    metricas:
+      intervalo: ${KAFKA_METRICAS_INTERVALO:30s}
+
+logging:
+  level:
+    root: WARN
+    com.softdesign.votacao: INFO
+    org.springdoc: ERROR
+    org.springframework.kafka.retrytopic.DeadLetterPublishingRecovererFactory: OFF
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"

@@ -7,6 +7,7 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     properties:
@@ -14,4 +15,17 @@ spring:
         format_sql: false
         jdbc:
           time_zone: UTC
+          batch_size: 1000
+        order_inserts: true
     show-sql: false
+
+seed:
+  quantidade-cpfs: ${CPF_SEED_QUANTIDADE:500}
+
+logging:
+  level:
+    root: WARN
+    com.softdesign.validacaocpf: INFO
+    org.springdoc: ERROR
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"

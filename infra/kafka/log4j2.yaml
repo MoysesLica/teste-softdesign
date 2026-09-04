@@ -1,0 +1,19 @@
+Configuration:
+  status: WARN
+  Properties:
+    Property:
+      - name: logPattern
+        value: "[%d{ISO8601}] %-5p %c - %m%n"
+  Appenders:
+    Console:
+      name: STDOUT
+      PatternLayout:
+        pattern: "${logPattern}"
+  Loggers:
+    Root:
+      level: WARN
+      AppenderRef:
+        ref: STDOUT
+    Logger:
+      - name: org.apache.kafka.controller.EventPerformanceMonitor
+        level: FATAL

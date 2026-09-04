@@ -1,6 +1,7 @@
 package com.softdesign.votacao.mapper;
 
 import com.softdesign.votacao.dto.voto.VotoCreateRequest;
+import com.softdesign.votacao.dto.voto.VotoAsyncResponse;
 import com.softdesign.votacao.dto.voto.VotoResponse;
 import com.softdesign.votacao.model.Voto;
 import org.mapstruct.*;
@@ -12,4 +13,5 @@ import org.mapstruct.*;
 public interface VotoMapper {
     Voto toEntity(VotoCreateRequest request);
     VotoResponse toResponse(Voto voto);
+    VotoAsyncResponse toAsyncResponse(Voto voto);
 }

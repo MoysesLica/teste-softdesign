@@ -11,8 +11,8 @@ import java.util.UUID;
 public record VotoCreateRequest(
     @NotBlank(message = "O CPF é obrigatório")
     @Pattern(
-            regexp = "\\d{11}",
-            message = "O CPF deve conter exatamente 11 números"
+        regexp = "\\d{11}",
+        message = "O CPF deve conter exatamente 11 números"
     )
     @CPF(message = "O CPF informado é inválido")
     String cpf,

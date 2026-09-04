@@ -2,8 +2,11 @@ package com.softdesign.votacao.controller.v1;
 
 import com.softdesign.votacao.dto.voto.VotoCreateRequest;
 import com.softdesign.votacao.dto.voto.VotoResponse;
+import com.softdesign.votacao.model.enums.OpcaoVoto;
+import com.softdesign.votacao.model.enums.StatusProcessamentoVoto;
 import com.softdesign.votacao.service.v1.VotoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,9 +45,19 @@ public class VotoController {
     @GetMapping("/{pautaId}")
     public ResponseEntity<PagedModel<VotoResponse>> listarPorPauta(
         @PathVariable UUID pautaId,
+        @Parameter(
+            description = "Status de processamento do voto",
+            schema = @Schema(implementation = StatusProcessamentoVoto.class)
+        )
+        @RequestParam(name = "status_processamento", required = false) StatusProcessamentoVoto statusProcessamento,
+        @Parameter(
+            description = "Opção do voto",
+            schema = @Schema(implementation = OpcaoVoto.class)
+        )
+        @RequestParam(required = false) OpcaoVoto opcao,
         @ParameterObject @PageableDefault(size = 20, sort = "dataCriacao", direction = Sort.Direction.DESC) Pageable pageable
     ){
-        return ResponseEntity.ok(new PagedModel<>(votoService.listarPorPauta(pautaId, pageable)));
+        return ResponseEntity.ok(new PagedModel<>(votoService.listarPorPauta(pautaId, statusProcessamento, opcao, pageable)));
     }
 
     @Operation(summary = "Realizar voto")

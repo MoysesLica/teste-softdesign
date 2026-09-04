@@ -34,4 +34,17 @@ public class OpenApiConfig {
             .build();
     }
 
+    @Bean
+    public GroupedOpenApi apiV3() {
+        return GroupedOpenApi.builder()
+            .group("v3")
+            .pathsToMatch("/api/v3/**")
+            .addOpenApiCustomizer(openApi ->
+                openApi.info(new Info()
+                    .title("API para o teste da SoftDesign")
+                    .description("Terceira versão da API")
+                    .version("v3")))
+            .build();
+    }
+
 }

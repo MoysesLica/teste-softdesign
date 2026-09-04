@@ -15,6 +15,8 @@ public record PautaResponse(
         ZonedDateTime dataEncerramento,
         String codigo,
         StatusPauta status,
+        long votosSim,
+        long votosNao,
         boolean ativo,
         ZonedDateTime dataCriacao,
         ZonedDateTime dataAtualizacao

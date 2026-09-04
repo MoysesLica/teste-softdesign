@@ -8,9 +8,9 @@ import com.softdesign.votacao.exception.PreconditionFailedException;
 import com.softdesign.votacao.exception.RecursoNaoEncontradoException;
 import com.softdesign.votacao.mapper.PautaMapper;
 import com.softdesign.votacao.model.Pauta;
-import com.softdesign.votacao.model.Voto;
 import com.softdesign.votacao.model.enums.OpcaoVoto;
 import com.softdesign.votacao.model.enums.StatusPauta;
+import com.softdesign.votacao.model.enums.StatusProcessamentoVoto;
 import com.softdesign.votacao.repository.PautaRepository;
 import com.softdesign.votacao.repository.VotoRepository;
 import jakarta.validation.Valid;
@@ -18,12 +18,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static com.softdesign.votacao.repository.specification.PautaSpecification.comAtivo;
@@ -86,19 +86,23 @@ public class PautaService {
         return pautaMapper.toResponse(pautaRepository.save(pauta));
     }
 
+    @Transactional
     public PautaResponse fecharVotacao(UUID id) {
-        Pauta pauta = pautaRepository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Pauta não encontrada"));
+        Pauta pauta = pautaRepository.findByIdParaFechamento(id).orElseThrow(() -> new RecursoNaoEncontradoException("Pauta não encontrada"));
         if(!pauta.isAbertoParaVotacao())
             throw new PreconditionFailedException("Pauta não aberta para votação");
         if(pauta.isFechada())
             throw new PreconditionFailedException("Pauta já fechada");
+        if(votoRepository.existsByPautaAndStatusProcessamento(pauta, StatusProcessamentoVoto.PENDENTE))
+            throw new PreconditionFailedException("Existem votos aguardando processamento");
         if(ZonedDateTime.now().isBefore(pauta.getDataEncerramento()))
             pauta.setDataEncerramento(ZonedDateTime.now());
         pauta.setAbertoParaVotacao(false);
         pauta.setFechada(true);
-        List<Voto> votos = votoRepository.findByPauta(pauta);
-        long sins = votos.stream().filter(voto -> voto.getOpcao().equals(OpcaoVoto.SIM)).count();
-        long naos = votos.stream().filter(voto -> voto.getOpcao().equals(OpcaoVoto.NAO)).count();
+        long sins = votoRepository.countByPautaAndOpcaoAndContabilizadoTrue(pauta, OpcaoVoto.SIM);
+        long naos = votoRepository.countByPautaAndOpcaoAndContabilizadoTrue(pauta, OpcaoVoto.NAO);
+        pauta.setVotosSim(sins);
+        pauta.setVotosNao(naos);
         pauta.setStatus(sins > naos ? StatusPauta.APROVADO : StatusPauta.REPROVADO);
         return pautaMapper.toResponse(pautaRepository.save(pauta));
     }

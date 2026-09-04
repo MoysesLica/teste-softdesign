@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,18 +19,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CpfSeed implements ApplicationRunner {
 
-    private static final int QUANTIDADE_CPFS = 500;
     private static final String CPF_REFERENCIA = "03425110250";
+    private static final int TAMANHO_LOTE_CONSULTA = 1000;
 
     private final CpfRepository cpfRepository;
+
+    @Value("${seed.quantidade-cpfs:500}")
+    private int quantidadeCpfs;
 
     @Override
     @Transactional
     public void run(@NonNull ApplicationArguments args) {
         List<String> cpfs = gerarCpfs();
-        Set<String> cpfsCadastrados = cpfRepository.findAllByCpfIn(cpfs).stream()
-            .map(Cpf::getCpf)
-            .collect(Collectors.toSet());
+        Set<String> cpfsCadastrados = buscarCpfsCadastrados(cpfs);
 
         List<Cpf> novosCpfs = cpfs.stream()
             .filter(cpf -> !cpfsCadastrados.contains(cpf))
@@ -41,11 +43,22 @@ public class CpfSeed implements ApplicationRunner {
         }
     }
 
+    private Set<String> buscarCpfsCadastrados(List<String> cpfs) {
+        Set<String> cadastrados = new LinkedHashSet<>();
+        for (int inicio = 0; inicio < cpfs.size(); inicio += TAMANHO_LOTE_CONSULTA) {
+            int fim = Math.min(inicio + TAMANHO_LOTE_CONSULTA, cpfs.size());
+            cadastrados.addAll(cpfRepository.findAllByCpfIn(cpfs.subList(inicio, fim)).stream()
+                .map(Cpf::getCpf)
+                .collect(Collectors.toSet()));
+        }
+        return cadastrados;
+    }
+
     private List<String> gerarCpfs() {
-        Set<String> cpfs = new LinkedHashSet<>(QUANTIDADE_CPFS);
+        Set<String> cpfs = new LinkedHashSet<>(quantidadeCpfs);
         cpfs.add(CPF_REFERENCIA);
 
-        for (int sequencial = 1; cpfs.size() < QUANTIDADE_CPFS; sequencial++) {
+        for (int sequencial = 1; cpfs.size() < quantidadeCpfs; sequencial++) {
             cpfs.add(gerarCpf(sequencial));
         }
 

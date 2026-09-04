@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestClient;
 
@@ -30,14 +31,17 @@ public class VotoService {
     private final VotoMapper votoMapper;
     private final RestClient cpfValidationRestClient;
 
+    @Transactional
     public VotoResponse criar(@Valid VotoCreateRequest votoRequest) {
-        Pauta pauta = pautaRepository.findById(votoRequest.pautaId()).orElseThrow(() -> new RecursoNaoEncontradoException("Pauta não encontrada"));
+        Pauta pauta = pautaRepository.findByIdParaVoto(votoRequest.pautaId()).orElseThrow(() -> new RecursoNaoEncontradoException("Pauta não encontrada"));
         if(votoRepository.existsByPautaAndCpf(pauta, votoRequest.cpf()))
             throw new PreconditionFailedException("Você já realizou um voto para esta pauta");
         validarPeriodoVotacao(pauta);
         validarCpfAptoParaVotar(votoRequest.cpf());
         Voto voto = votoMapper.toEntity(votoRequest);
         voto.setPauta(pauta);
+        voto.setCpfValidado(true);
+        voto.setAptoParaVotar(true);
         return votoMapper.toResponse(votoRepository.save(voto));
     }
 

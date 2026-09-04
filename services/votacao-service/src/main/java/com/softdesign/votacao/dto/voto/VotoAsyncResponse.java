@@ -6,13 +6,15 @@ import com.softdesign.votacao.model.enums.StatusProcessamentoVoto;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public record VotoResponse (
+public record VotoAsyncResponse(
     UUID id,
     OpcaoVoto opcao,
-    ZonedDateTime dataCriacao,
+    String cpf,
     boolean cpfValidado,
     boolean aptoParaVotar,
     boolean contabilizado,
-    StatusProcessamentoVoto statusProcessamento
+    StatusProcessamentoVoto statusProcessamento,
+    ZonedDateTime dataCriacao,
+    ZonedDateTime dataAtualizacao
 ) {
 }
